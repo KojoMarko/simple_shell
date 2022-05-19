@@ -95,7 +95,6 @@ void _malloc(char **lineptr, size_t *n, char *buffer, size_t b);
 char **_strtok(char *line, char *delim);
 char *get_location(char *command);
 lists_t *get_path_dir(char *path);
-int execute(char **args, char **front);
 void free_list(lists_t *head);
 char *_itoa(int num);
 
