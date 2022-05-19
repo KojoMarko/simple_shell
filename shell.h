@@ -66,6 +66,7 @@ aliases_t *aliases;
 /* Main Helpers */
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
+void _malloc(char **lineptr, size_t *n, char *buffer, size_t b);
 char **_strtok(char *line, char *delim);
 char *get_location(char *command);
 lists_t *get_path_dir(char *path);
