@@ -47,12 +47,30 @@ typedef struct builtins_s
 	int (*f)(char **argv, char **front);
 } builtins_t;
 
-/* --- shell --- */
+/**
+ * shell - a function that executes the
+ * loop's functionalities
+ * @build: input build params
+ *
+ * Description: reviews user inputs and validates strings;
+ * otherwise, check the path, fork and execute it
+ * Return: void
+ */
 void shell(config *build);
 void validate_line(config *build);
 void fork_and_execute(config *build);
 void strip_comments(char *str);
 void convert_llist_to_arr(config *build);
+
+/**
+ * config_init - initialize member values for config struct
+ * @build: input build
+ *
+ * Description: Accepts structured input command, and finds the right
+ * configuration to execute from the built-in configurations.
+ * Return: build with initialized members
+ */
+config *config_init(config *build);
 
 /**
  * struct alias_s - A new struct defining aliases.
@@ -127,7 +145,7 @@ char *error_2_syntax(char **args);
 char *error_126(char **args);
 char *error_127(char **args);
 
-/* Linkedlist Helpers */
+/* Linked list Helpers */
 aliases_t *add_alias_end(aliases_t **head, char *name, char *value);
 void free_alias_list(aliases_t *head);
 lists_t *add_node_end(lists_t **head, char *dir);
