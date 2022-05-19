@@ -47,6 +47,13 @@ typedef struct builtins_s
 	int (*f)(char **argv, char **front);
 } builtins_t;
 
+/* --- shell --- */
+void shell(config *build);
+void validate_line(config *build);
+void fork_and_execute(config *build);
+void strip_comments(char *str);
+void convert_llist_to_arr(config *build);
+
 /**
  * struct alias_s - A new struct defining aliases.
  * @name: The name of the alias.
