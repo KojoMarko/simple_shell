@@ -1,165 +1,179 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include <fcntl.h>
-#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <fcntl.h>
 #include <errno.h>
-#include <stdio.h>
+#include <signal.h>
+#include <limits.h>
 
-#define END_OF_FILE -2
-#define EXIT -3
+/* --- Built-in Errors --- */
+#define BUFSIZE 256
+#define ENOSTRING 1106
+#define EILLEGAL 227
+#define EWSIZE 410
+#define ENOBUILTIN 415
+#define EBADCD 726
 
-/* Global Environemnt */
 extern char **environ;
 
-/* Global Program Name */
-char *name;
-
-/* Global History Counter */
-int hist;
-
 /**
- * struct lists_s - A new struct type defining a linked list.
- * @dir: A directory path.
- * @next: A pointer to another struct list_s.
+ * struct linkedList - linked list data structure
+ * @string: environ variable path name
+ * @next: pointer to next node
  */
-typedef struct lists_s
+typedef struct linkedList
 {
-	char *dir;
-	struct lists_s *next;
-} lists_t;
+	char *string;
+	struct linkedList *next;
+} linked_l;
 
 /**
- * struct builtins_s - A new struct type defining builtin commands.
- * @name: The name of the builtin command.
- * @f: A function pointer to the builtin command's function.
+ * struct configurations - configuration of build settings
+ * @env: linked list of local env variables
+ * @env_list: array of env variables to put into execve
+ * @args: array of argument strings
+ * @buffer: string buffer of user input
+ * @path: array of $PATH locations
+ * @full_path: string of path with correct prepended $PATH
+ * @shell_name: name of shell (argv[0])
+ * @count_line: counter of lines users have entered
+ * @error_status: error status of last child process
  */
-typedef struct builtins_s
+typedef struct configurations
 {
-	char *name;
-	int (*f)(char **argv, char **front);
-} builtins_t;
+	linked_l *env;
+	char **env_list;
+	char **args;
+	char *buffer;
+	char *path;
+	char *full_path;
+	char *shell_name;
+	unsigned int count_line;
+	int error_status;
+} config;
 
 /**
- * shell - a function that executes the
- * loop's functionalities
- * @build: input build params
- *
- * Description: reviews user inputs and validates strings;
- * otherwise, check the path, fork and execute it
- * Return: void
+ * struct builtInCommands - commands and functions associated with it
+ * @command: input command
+ * @func: output function
  */
+typedef struct builtInCommands
+{
+	char *command;
+	int (*func)(config *build);
+} type_b;
+
+/* --- main --- */
+config *config_init(config *build);
+
+/* --- built_ins --- */
+_Bool find_built_ins(config *build);
+int exit_function(config *build);
+int history_function(config *build);
+int alias_function(config *build);
+
+/* --- built_in_controls --- */
+int count_args(char **args);
+int _atoi(char *s);
+
+/* --- cd --- */
+int implement_cd(config *);
+_Bool cd_to_home(config *build);
+_Bool cd_to_previous(config *build);
+_Bool cd_to_custom(config *build);
+_Bool update_environ(config *build);
+
+/* --- cd2 --- */
+int update_old(config *build);
+_Bool update_cur_dir(config *build, int index);
+
+/* --- env_variables --- */
+int env_function(config *build);
+int set_env_func(config *build);
+int unset_env_func(config *build);
+int is_alpha(int c);
+
+/* --- help_functions --- */
+int help_function(config *build);
+int display_help_menu(void);
+int help_guide_exit(config *build);
+int help_env(config *build);
+int help_history(config *build);
+int help_alias(config *build);
+int help_cd(config *build);
+int help_set_env(config *build);
+int help_unset_env(config *build);
+int help_guide(config *build);
+
+/* --- shell --- */
 void shell(config *build);
 void validate_line(config *build);
 void fork_and_execute(config *build);
 void strip_comments(char *str);
 void convert_llist_to_arr(config *build);
 
-/**
- * config_init - initialize member values for config struct
- * @build: input build
- *
- * Description: Accepts structured input command, and finds the right
- * configuration to execute from the built-in configurations.
- * Return: build with initialized members
- */
-config *config_init(config *build);
+/* _getenv */
+char *_getenv(char *input, char **environ);
 
-/**
- * struct alias_s - A new struct defining aliases.
- * @name: The name of the alias.
- * @value: The value of the alias.
- * @next: A pointer to another struct alias_s.
- */
-typedef struct aliases_s
-{
-	char *name;
-	char *value;
-	struct aliases_s *next;
-} aliases_t;
+/* Error handlers*/
+void handle_errors(config *build);
+unsigned int count_num_digits(int num);
+char *itoa(unsigned int num);
+char *get_error_message();
 
-/* Global aliases linked list */
-aliases_t *aliases;
+/* shell_controls */
+void get_null_bytes(char *str, unsigned int index);
+void get_prompt(void);
+void put_new_line(void);
+void handle_sigint(int sigint);
 
-/* Main Helpers */
-ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
-void _malloc(char **lineptr, size_t *n, char *buffer, size_t b);
-char **_strtok(char *line, char *delim);
-char *get_location(char *command);
-lists_t *get_path_dir(char *path);
-void free_list(lists_t *head);
-char *_itoa(int num);
+/* --- free --- */
+void free_member(config *build);
+void free_args_and_buffer(config *build);
+void free_args(char **args);
+void free_list(linked_l *head);
 
-/* Input Helpers */
-void handleline(char **line, ssize_t read);
-void variable_replacer(char **args, int *exe_ret);
-char *get_args(char *line, int *exe_ret);
-int call_args(char **args, char **front, int *exe_ret);
-int run_args(char **args, char **front, int *exe_ret);
-int handle_args(int *exe_ret);
-int check_args(char **args);
-void free_args(char **args, char **front);
-char **replace_alias(char **args);
+/* --- split_string --- */
+_Bool split_string(config *build);
+unsigned int count_words(char *s);
+_Bool is_space(char c);
 
-/* String functions */
-int _strlen(const char *s);
-char *_strcat(char *dest, const char *src);
-char *_strncat(char *dest, const char *src, size_t n);
-char *_strcpy(char *dest, const char *src);
-char *_strchr(char *s, char c);
-int _strspn(char *s, char *accept);
+/* --- string_controls --- */
+int _strlen(char *s);
+char *_strcat(char *dest, char *src);
 int _strcmp(char *s1, char *s2);
-int _strncmp(const char *s1, const char *s2, size_t n);
+char *_strdup(char *str);
+char *_strcpy(char *dest, char *src);
 
-/* Builtins */
-int (*get_builtin(char *command))(char **args, char **front);
-int shellie_exit(char **args, char **front);
-int shellie_env(char **args, char __attribute__((__unused__)) **front);
-int shellie_setenv(char **args, char __attribute__((__unused__)) **front);
-int shellie_unsetenv(char **args, char __attribute__((__unused__)) **front);
-int shellie_cd(char **args, char __attribute__((__unused__)) **front);
-int shellie_alias(char **args, char __attribute__((__unused__)) **front);
-int shellie_help(char **args, char __attribute__((__unused__)) **front);
+/* --- string_controls2 --- */
+char *_strtok(char *str, char *delim);
+int _strcspn(char *string, char *chars);
+char *_strchr(char *s, char c);
 
-/* Builtin Helpers */
-char **_copy_env(void);
-void free_env(void);
-char **_get_env(const char *var);
+/* --- check_path --- */
+_Bool check_path(config *);
+_Bool validate_constraints(config *build);
 
-/* Error Handling */
-int create_error(char **args, int err);
-char *error_env(char **args);
-char *error_1(char **args);
-char *error_2_exit(char **args);
-char *error_2_cd(char **args);
-char *error_2_syntax(char **args);
-char *error_126(char **args);
-char *error_127(char **args);
+/* --- linked list_functions --- */
+linked_l *add_node_to_front(linked_l **head, char *str);
+linked_l *add_node_to_end(linked_l **head, char *str);
+size_t print_list(const linked_l *h);
+int search_node(linked_l *head, char *str);
+size_t list_len(linked_l *h);
+int delete_node_at_index(linked_l **head, unsigned int index);
+linked_l *generateLinkedList(char **array);
+linked_l *add_node_at_index(linked_l **head, int index, char *str);
+char *get_node_at_index(linked_l *head, unsigned int index);
 
-/* Linked list Helpers */
-aliases_t *add_alias_end(aliases_t **head, char *name, char *value);
-void free_alias_list(aliases_t *head);
-lists_t *add_node_end(lists_t **head, char *dir);
-void free_list(lists_t *head);
-
-void help_all(void);
-void help_alias(void);
-void help_cd(void);
-void help_exit(void);
-void help_help(void);
-void help_env(void);
-void help_setenv(void);
-void help_unsetenv(void);
-void help_history(void);
-
-int proc_file_commands(char *file_path, int *exe_ret);
+/* --- _realloc --- */
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
+char *_memcpy(char *dest, char *src, unsigned int n);
 
 #endif /* SHELL_H */
