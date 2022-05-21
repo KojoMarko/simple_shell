@@ -1,11 +1,11 @@
 #include "shell.h"
 
-int shellby_alias(char **args, char __attribute__((__unused__)) **front);
+int shellie_alias(char **args, char __attribute__((__unused__)) **front);
 void set_alias(char *var_name, char *value);
-void print_alias(alias_t *alias);
+void print_alias(aliases_t *alias);
 
 /**
- * shellby_alias - Builtin command that either prints all aliases, specific
+ * shellie_alias - Builtin command that either prints all aliases, specific
  * aliases, or sets an alias.
  * @args: An array of arguments.
  * @front: A double pointer to the beginning of args.
@@ -13,9 +13,9 @@ void print_alias(alias_t *alias);
  * Return: If an error occurs - -1.
  *         Otherwise - 0.
  */
-int shellby_alias(char **args, char __attribute__((__unused__)) **front)
+int shellie_alias(char **args, char __attribute__((__unused__)) **front)
 {
-	alias_t *temp = aliases;
+	aliases_t *temp = aliases;
 	int i, ret = 0;
 	char *value;
 
@@ -60,7 +60,7 @@ int shellby_alias(char **args, char __attribute__((__unused__)) **front)
  */
 void set_alias(char *var_name, char *value)
 {
-	alias_t *temp = aliases;
+	aliases_t *temp = aliases;
 	int len, j, k;
 	char *new_value;
 
@@ -94,7 +94,7 @@ void set_alias(char *var_name, char *value)
  * print_alias - Prints the alias in the format name='value'.
  * @alias: Pointer to an alias.
  */
-void print_alias(alias_t *alias)
+void print_alias(aliases_t *alias)
 {
 	char *alias_string;
 	int len = _strlen(alias->name) + _strlen(alias->value) + 4;
@@ -111,15 +111,15 @@ void print_alias(alias_t *alias)
 	free(alias_string);
 }
 /**
- * replace_aliases - Goes through the arguments and replace any matching alias
+ * replace_alias - Goes through the arguments and replace any matching alias
  * with their value.
  * @args: 2D pointer to the arguments.
  *
  * Return: 2D pointer to the arguments.
  */
-char **replace_aliases(char **args)
+char **replace_alias(char **args)
 {
-	alias_t *temp;
+	aliases_t *temp;
 	int i;
 	char *new_value;
 

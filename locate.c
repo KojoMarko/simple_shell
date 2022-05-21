@@ -1,7 +1,7 @@
 #include "shell.h"
 
 char *fill_path_dir(char *path);
-list_t *get_path_dir(char *path);
+lists_t *get_path_dir(char *path);
 
 /**
  * get_location - Locates a command in the PATH.
@@ -13,10 +13,10 @@ list_t *get_path_dir(char *path);
 char *get_location(char *command)
 {
 	char **path, *temp;
-	list_t *dirs, *head;
+	lists_t *dirs, *head;
 	struct stat st;
 
-	path = _getenv("PATH");
+	path = _get_env("PATH");
 	if (!path || !(*path))
 		return (NULL);
 
@@ -61,7 +61,7 @@ char *fill_path_dir(char *path)
 	int i, length = 0;
 	char *path_copy, *pwd;
 
-	pwd = *(_getenv("PWD")) + 4;
+	pwd = *(_get_env("PWD")) + 4;
 	for (i = 0; path[i]; i++)
 	{
 		if (path[i] == ':')
@@ -110,11 +110,11 @@ char *fill_path_dir(char *path)
  *
  * Return: A pointer to the initialized linked list.
  */
-list_t *get_path_dir(char *path)
+lists_t *get_path_dir(char *path)
 {
 	int index;
 	char **dirs, *path_copy;
-	list_t *head = NULL;
+	lists_t *head = NULL;
 
 	path_copy = fill_path_dir(path);
 	if (!path_copy)

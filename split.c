@@ -1,11 +1,11 @@
 #include "shell.h"
 
-int token_len(char *str, char *delim);
-int count_tokens(char *str, char *delim);
+int lentoken(char *str, char *delim);
+int tokencounter(char *str, char *delim);
 char **_strtok(char *line, char *delim);
 
 /**
- * token_len - Locates the delimiter index marking the end
+ * lentoken - Locates the delimiter index marking the end
  *             of the first token contained within a string.
  * @str: The string to be searched.
  * @delim: The delimiter character.
@@ -13,7 +13,7 @@ char **_strtok(char *line, char *delim);
  * Return: The delimiter index marking the end of
  *         the intitial token pointed to be str.
  */
-int token_len(char *str, char *delim)
+int lentoken(char *str, char *delim)
 {
 	int index = 0, len = 0;
 
@@ -27,14 +27,14 @@ int token_len(char *str, char *delim)
 }
 
 /**
- * count_tokens - Counts the number of delimited
+ * tokencounter - Counts the number of delimited
  *                words contained within a string.
  * @str: The string to be searched.
  * @delim: The delimiter character.
  *
  * Return: The number of words contained within str.
  */
-int count_tokens(char *str, char *delim)
+int tokencounter(char *str, char *delim)
 {
 	int index, tokens = 0, len = 0;
 
@@ -46,7 +46,7 @@ int count_tokens(char *str, char *delim)
 		if (*(str + index) != *delim)
 		{
 			tokens++;
-			index += token_len(str + index, delim);
+			index += lentoken(str + index, delim);
 		}
 	}
 
@@ -65,7 +65,7 @@ char **_strtok(char *line, char *delim)
 	char **ptr;
 	int index = 0, tokens, t, letters, l;
 
-	tokens = count_tokens(line, delim);
+	tokens = tokencounter(line, delim);
 	if (tokens == 0)
 		return (NULL);
 
@@ -78,7 +78,7 @@ char **_strtok(char *line, char *delim)
 		while (line[index] == *delim)
 			index++;
 
-		letters = token_len(line + index, delim);
+		letters = lentoken(line + index, delim);
 
 		ptr[t] = malloc(sizeof(char) * (letters + 1));
 		if (!ptr[t])

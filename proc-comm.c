@@ -91,8 +91,8 @@ int proc_file_commands(char *file_path, int *exe_ret)
 				line[i] = ' ';
 		}
 	}
-	variable_replacement(&line, exe_ret);
-	handle_line(&line, line_size);
+	variable_replacer(&line, exe_ret);
+	handleline(&line, line_size);
 	args = _strtok(line, " ");
 	free(line);
 	if (!args)

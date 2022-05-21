@@ -18,7 +18,7 @@ char *get_args(char *line, int *exe_ret)
 {
 	size_t n = 0;
 	ssize_t read;
-	char *prompt = "$ ";
+	char *prompt = "#shellie$ ";
 
 	if (line)
 		free(line);
@@ -35,8 +35,8 @@ char *get_args(char *line, int *exe_ret)
 	}
 
 	line[read - 1] = '\0';
-	variable_replacement(&line, exe_ret);
-	handle_line(&line, read);
+	variable_replacer(&line, exe_ret);
+	handleline(&line, read);
 
 	return (line);
 }
@@ -61,7 +61,7 @@ int call_args(char **args, char **front, int *exe_ret)
 		{
 			free(args[index]);
 			args[index] = NULL;
-			args = replace_aliases(args);
+			args = replace_alias(args);
 			ret = run_args(args, front, exe_ret);
 			if (*exe_ret != 0)
 			{
@@ -79,7 +79,7 @@ int call_args(char **args, char **front, int *exe_ret)
 		{
 			free(args[index]);
 			args[index] = NULL;
-			args = replace_aliases(args);
+			args = replace_alias(args);
 			ret = run_args(args, front, exe_ret);
 			if (*exe_ret == 0)
 			{
@@ -94,7 +94,7 @@ int call_args(char **args, char **front, int *exe_ret)
 			}
 		}
 	}
-	args = replace_aliases(args);
+	args = replace_alias(args);
 	ret = run_args(args, front, exe_ret);
 	return (ret);
 }
